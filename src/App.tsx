@@ -7,7 +7,7 @@ import AddTileForm from "./components/AddTileForm";
 
 function App() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [initialOrder, setInitialOrder] = useState<Message[]>([]);
+  const [initialOrder, setInitialOrder] = useState<Message[]>(input);
   const [showForm, setShowForm] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
 
@@ -16,12 +16,16 @@ function App() {
     if (storedMessages) {
       const parsedMessages = JSON.parse(storedMessages);
       setMessages(parsedMessages);
-      setInitialOrder(parsedMessages);
     } else {
       localStorage.setItem("tilesData", JSON.stringify(input));
       setMessages(input);
-      setInitialOrder(input);
     }
+  }, []);
+
+  useEffect(() => {
+    // Clear localStorage for testing
+    localStorage.removeItem("tilesData");
+    setMessages(input);
   }, []);
 
   useEffect(() => {
@@ -70,6 +74,7 @@ function App() {
   const handleAddMessage = (newMessage: Message) => {
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
+    // Optionally update initialOrder
     setInitialOrder((prev) => [...prev, newMessage]);
   };
 
