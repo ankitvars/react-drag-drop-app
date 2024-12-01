@@ -23,12 +23,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Clear localStorage for testing
-    localStorage.removeItem("tilesData");
-    setMessages(input);
-  }, []);
-
-  useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("tilesData", JSON.stringify(messages));
     }
@@ -74,7 +68,6 @@ function App() {
   const handleAddMessage = (newMessage: Message) => {
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
-    // Optionally update initialOrder
     setInitialOrder((prev) => [...prev, newMessage]);
   };
 
