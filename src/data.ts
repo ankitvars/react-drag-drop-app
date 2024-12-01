@@ -1,4 +1,4 @@
-// Imports
+// Imported type from the types file
 import { Message } from "./types";
 
 export const input: Message[] = [

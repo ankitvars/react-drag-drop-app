@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import { input } from "./data";
 import { Message } from "./types";
@@ -6,10 +6,29 @@ import Tile from "./components/Tile";
 import AddTileForm from "./components/AddTileForm";
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>(input);
-  const [initialOrder, setInitialOrder] = useState<Message[]>([...input]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [initialOrder, setInitialOrder] = useState<Message[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const storedMessages = localStorage.getItem("tilesData");
+    if (storedMessages) {
+      const parsedMessages = JSON.parse(storedMessages);
+      setMessages(parsedMessages);
+      setInitialOrder(parsedMessages);
+    } else {
+      localStorage.setItem("tilesData", JSON.stringify(input));
+      setMessages(input);
+      setInitialOrder(input);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("tilesData", JSON.stringify(messages));
+    }
+  }, [messages]);
 
   const handleDragStart = (
     _e: React.DragEvent<HTMLDivElement>,
@@ -32,19 +51,11 @@ function App() {
     setMessages(newMessages);
   };
 
-  const handleInitialOrder = () => {
-    setMessages([...initialOrder]);
-  };
-
   const handleSortedOrder = () => {
     const sorted = [...messages].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     setMessages(sorted);
-  };
-
-  const handleOpenForm = () => {
-    setShowForm(true);
   };
 
   const groupedMessages = messages.reduce((acc, message) => {
@@ -57,8 +68,17 @@ function App() {
   }, {} as Record<number, Message[]>);
 
   const handleAddMessage = (newMessage: Message) => {
-    setMessages([...messages, newMessage]);
-    setInitialOrder([...initialOrder, newMessage]);
+    const updatedMessages = [...messages, newMessage];
+    setMessages(updatedMessages);
+    setInitialOrder((prev) => [...prev, newMessage]);
+  };
+
+  const handleInitialOrder = () => {
+    setMessages([...initialOrder]);
+  };
+
+  const handleOpenForm = () => {
+    setShowForm(true);
   };
 
   const handleCloseForm = () => {
